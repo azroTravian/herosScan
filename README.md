@@ -2,4 +2,5 @@
 
 
 
-Ceci est un outil à utilisation personnelle de scan des héros d'un serveur pour lequel vous disposez d'un accès. Il permet, en spécifiant les comptes à scanner, d'avoir un détail de l'équipement et l'exp à interval régulier.
+Ceci est un outil Ã  utilisation personnelle de scan des hÃ©ros d'un serveur pour lequel vous disposez d'un accÃ¨s. Il permet, en spÃ©cifiant les comptes 
+Ã  scanner, d'avoir un dÃ©tail de l'Ã©quipement et l'exp Ã  interval rÃ©gulier.
