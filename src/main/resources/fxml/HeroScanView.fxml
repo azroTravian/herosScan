@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.111"
+  fx:controller="scanheros.scan.controller.ScanController" fx:id="home">
+  <center>
+    <TableView BorderPane.alignment="CENTER" fx:id="table">
+      <columns>
+        <TableColumn minWidth="75.0" prefWidth="75.0" text="id" fx:id="col_id"/>
+        <TableColumn minWidth="75.0" prefWidth="75.0" text="Pseudo" fx:id="col_pseudo"/>
+        <TableColumn minWidth="100.0" prefWidth="150.0" text="Casque" fx:id="col_casque"/>
+        <TableColumn minWidth="100.0" prefWidth="150.0" text="Bras droit" fx:id="col_bdroit"/>
+        <TableColumn minWidth="70.0" prefWidth="75.0" text="Bras gauche" fx:id="col_bgauche"/>
+        <TableColumn minWidth="100.0" prefWidth="150.0" text="Armure" fx:id="col_armure"/>
+        <TableColumn minWidth="50.0" prefWidth="75.0" text="Bottes" fx:id="col_bottes"/>
+        <TableColumn minWidth="50.0" prefWidth="60.0" text="Cheval" fx:id="col_cheval"/>
+        <TableColumn minWidth="70.0" prefWidth="75.0" text="Expérience" fx:id="col_exp"/>
+        <TableColumn minWidth="150.0" prefWidth="160.0" text="Date" fx:id="col_date"/>
+      </columns>
+      <columnResizePolicy>
+        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+      </columnResizePolicy>
+    </TableView>
+  </center>
+  <top>
+    <VBox BorderPane.alignment="CENTER">
+      <children>
+        <MenuBar fx:id="menuBar">
+          <menus>
+            <Menu mnemonicParsing="false" text="Fichier SQL" fx:id="menuSQL">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#sql1_onclick" text="TG -&gt; PC"
+                  fx:id="menuSql1"/>
+                <MenuItem mnemonicParsing="false" onAction="#sql2_onclick" text="PC -&gt; BD"
+                  fx:id="menuSql2"/>
+                <SeparatorMenuItem mnemonicParsing="false"/>
+                <MenuItem mnemonicParsing="false" onAction="#sql3_onclick" text="TG -&gt; BD"
+                  fx:id="menuSql3"/>
+              </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Ajout Héros" fx:id="menuAjoutHero">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#ajpseudo_onclick" text="Par Pseudo"
+                  fx:id="menuAjPseudo"/>
+                <MenuItem mnemonicParsing="false" onAction="#ajid_onclick" text="Par ID"
+                  fx:id="menuAjId"/>
+              </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Check Heros" fx:id="menuCheck">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#once_onclick" text="Check Once"
+                  fx:id="menuChOnce"/>
+                <MenuItem mnemonicParsing="false" onAction="#auto_onclick" text="Check "
+                  fx:id="menuChAuto"/>
+              </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Serveur" fx:id="menuServeur">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#changeServ_onclick"
+                  text="Changer de serveur" fx:id="menuChangeServeur"/>
+                <MenuItem mnemonicParsing="false" onAction="#voirServ_onclick" text="Aller à .."
+                  fx:id="menuVoir"/>
+              </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Nettoyage" fx:id="menuSuppr">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#supprSelect_onclick" text="Sélection"
+                  fx:id="menuSupprSelect"/>
+                <MenuItem mnemonicParsing="false" onAction="#supprAll_onclick" text="Tout"
+                  fx:id="menuSupprAll"/>
+              </items>
+            </Menu>
+          </menus>
+        </MenuBar>
+        <HBox alignment="CENTER_LEFT" fx:id="hbox_top">
+          <children>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefWidth="110.0"
+              text="Recherche Pseudo : " textAlignment="CENTER">
+              <HBox.margin>
+                <Insets left="5.0" right="5.0"/>
+              </HBox.margin>
+            </Label>
+            <TextField maxWidth="150.0" prefWidth="150.0" fx:id="cherche_pseudo"/>
+            <Separator orientation="VERTICAL" prefHeight="25.0">
+              <HBox.margin>
+                <Insets left="5.0" right="5.0"/>
+              </HBox.margin>
+            </Separator>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefWidth="110.0"
+              text="Recherche Instant : " textAlignment="CENTER"/>
+            <Spinner amountToStepBy="1" editable="true" initialValue="12" max="23" min="0"
+              prefWidth="60.0" fx:id="sp_heure">
+              <HBox.margin>
+                <Insets left="2.0" right="2.0"/>
+              </HBox.margin>
+            </Spinner>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefWidth="15.0" text="h"
+              textAlignment="CENTER">
+              <HBox.margin>
+                <Insets left="5.0" right="5.0"/>
+              </HBox.margin>
+            </Label>
+            <Spinner amountToStepBy="1" editable="true" initialValue="00" max="59" min="00"
+              prefWidth="60.0" fx:id="sp_minute">
+              <HBox.margin>
+                <Insets left="1.0" right="1.0"/>
+              </HBox.margin>
+            </Spinner>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefWidth="18.0" text="m"
+              textAlignment="CENTER">
+              <HBox.margin>
+                <Insets left="5.0" right="5.0"/>
+              </HBox.margin>
+            </Label>
+            <Spinner amountToStepBy="1" editable="true" initialValue="00" max="59" min="00"
+              prefWidth="60.0" fx:id="sp_seconde">
+              <HBox.margin>
+                <Insets left="1.0" right="1.0"/>
+              </HBox.margin>
+            </Spinner>
+            <Label alignment="CENTER" contentDisplay="CENTER" prefWidth="15.0" text="s"
+              textAlignment="CENTER">
+              <HBox.margin>
+                <Insets left="5.0" right="5.0"/>
+              </HBox.margin>
+            </Label>
+            <DatePicker prefWidth="110.0" fx:id="pick_date">
+              <HBox.margin>
+                <Insets left="2.0" right="2.0"/>
+              </HBox.margin>
+            </DatePicker>
+            <ToggleButton mnemonicParsing="false" text="Filter" fx:id="toggle_filter"/>
+          </children>
+        </HBox>
+      </children>
+    </VBox>
+  </top>
+  <bottom>
+    <Label BorderPane.alignment="CENTER" text="© All Rights Reserved - Made by azro"
+      textFill="#430707">
+      <font>
+        <Font name="System Bold" size="12.0"/>
+      </font>
+    </Label>
+  </bottom>
+</BorderPane>

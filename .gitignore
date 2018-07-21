@@ -1,0 +1,19 @@
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+
+# bdb
+/OSAR.db
+OSAR_Impl/OSAR.db
+
+Projets/
+
+
