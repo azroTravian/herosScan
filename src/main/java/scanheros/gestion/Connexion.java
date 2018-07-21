@@ -59,7 +59,7 @@ public class Connexion {
     }
 
     /**
-     * @return la liste des ID trouv�s
+     * @return la liste des ID trouvés
      */
     public HashMap<String, Enregistrement> getIdFromPseudo(ArrayList<String> listePseudo) {
         HashMap<String, Enregistrement> mapId = new HashMap<>();

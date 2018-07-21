@@ -12,12 +12,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.ObservableList;
 import javax.imageio.ImageIO;
-import scanheros.Exception.GenderNotFindException;
+import scanheros.controller.Ligne;
+import scanheros.controller.ScanController;
 import scanheros.equipements.EquipementFemme;
 import scanheros.equipements.EquipementHomme;
 import scanheros.equipements.IEquipement;
-import scanheros.scan.controller.Ligne;
-import scanheros.scan.controller.ScanController;
+import scanheros.exception.GenderNotFindException;
 
 public class TimerScanTask extends TimerTask {
 
@@ -61,18 +61,18 @@ public class TimerScanTask extends TimerTask {
                 time = System.nanoTime();
                 String imageNom = "img" + ligne.getId() + ".png";
 
-                /* On r�cup�re l'image du h�ros*/
+                /* On récupère l'image du héros*/
                 getImageFromWeb(imageNom, ligne.getId());
 
                 /* On ouvre l'image dans un BufferedImage*/
                 BufferedImage image = ImageIO.read(new File(imageNom));
 
-                /* On cr�e l'Enregistrement et on le rempli de ses infos visuelles*/
+                /* On crée l'Enregistrement et on le rempli de ses infos visuelles*/
                 Enregistrement enre = new Enregistrement(ligne.getId(), ligne.getPseudo(), image,
                     equipH, equipF);
 
                 /* On supprime l'image, pour pas stocker inutilement des images*/
-                new File(imageNom).delete();
+                new File(imageNom).delete()
 
                 /* On termine par l'exp*/
                 enre.setExperience(ScanController.getExpe().getExp(enre.getPseudo()));

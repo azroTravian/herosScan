@@ -1,4 +1,4 @@
-package scanheros.Exception;
+package scanheros.exception;
 
 public class GenderNotFindException extends Exception {
 

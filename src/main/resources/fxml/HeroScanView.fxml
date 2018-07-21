@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.111"
-  fx:controller="scanheros.scan.controller.ScanController" fx:id="home">
+  fx:controller="scanheros.controller.ScanController" fx:id="home">
   <center>
     <TableView BorderPane.alignment="CENTER" fx:id="table">
       <columns>

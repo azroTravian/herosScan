@@ -28,8 +28,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import scanheros.Lanceur;
+import scanheros.controller.Ligne;
 import scanheros.gestion.Connexion;
-import scanheros.scan.controller.Ligne;
 
 
 public class PopupAddHero extends Popup {
@@ -80,7 +80,7 @@ public class PopupAddHero extends Popup {
         return fnlist;
     }
 
-    @SuppressWarnings("unchecked")
+
     public void start(Stage s) throws Exception {
         super.start(getMyDialog());
         getMyDialog().getIcons()
@@ -137,7 +137,7 @@ public class PopupAddHero extends Popup {
                 if (newValue.intValue() > oldValue.intValue()) {
                     char ch = tf1.getText().charAt(oldValue.intValue());
                     // Check if the new character is the number or other's
-                    //il ne faut que des chiffres, pas de point, et inf�rieur � 99999
+                    //il ne faut que des chiffres, pas de point, et inférieur à 99999
                     if (!((ch >= '0' && ch <= '9') || Integer.valueOf(tf1.getText()) > 99999)) {
                         // if it's not number then just setText to previous one
                         tf1.setText(tf1.getText().substring(0, tf1.getText().length() - 1));
@@ -154,7 +154,7 @@ public class PopupAddHero extends Popup {
 
         final Button addButton = new Button("Add");
         addButton.setOnAction(event -> {
-            if (type == "Pseudo") {
+            if (Objects.equals(type, "Pseudo")) {
                 if (!tf2.getText().isEmpty()) {
                     String idres = "";
                     ResultSet resultSet = connexion.query(
@@ -168,14 +168,14 @@ public class PopupAddHero extends Popup {
                         System.err.println("---  ERREUR  ---");
                         e.printStackTrace();
                     }
-                    //On v�rifie que la ligne n'est pas d�j� pr�sente, si oui inutile de l'ajouter
+                    //On vérifie que la ligne n'est pas déjà présente, si oui inutile de l'ajouter
                     if (idres != null &&
                         !d.contains(new Ligne(tf2.getText(), Integer.valueOf(idres))) &&
                         !data.contains(new Ligne(tf2.getText(), Integer.valueOf(idres)))) {
                         data.add(new Ligne(tf2.getText(), Integer.valueOf(idres)));
                     }
                 }
-            } else if (type == "Id") {
+            } else if (Objects.equals(type, "Id")) {
                 if (!tf1.getText().isEmpty()) {
                     String psres = "";
                     ResultSet resultSet = connexion.query(
@@ -189,7 +189,7 @@ public class PopupAddHero extends Popup {
                         System.err.println("---  ERREUR  ---");
                         e.printStackTrace();
                     }
-                    //On v�rifie que la ligne n'est pas d�j� pr�sente, si oui inutile de l'ajouter
+                    //On vérifie que la ligne n'est pas déjà présente, si oui inutile de l'ajouter
                     if (!d.contains(new Ligne(psres, Integer.valueOf(tf1.getText()))) &&
                         !data.contains(new Ligne(psres, Integer.valueOf(tf1.getText()))) &&
                         psres != null) {

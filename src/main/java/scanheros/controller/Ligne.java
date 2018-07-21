@@ -1,4 +1,4 @@
-package scanheros.scan.controller;
+package scanheros.controller;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;

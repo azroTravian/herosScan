@@ -9,7 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import scanheros.scan.Hardware4Win;
+import scanheros.security.Hardware4Win;
 
 public class Lanceur extends Application {
 
@@ -36,7 +36,7 @@ public class Lanceur extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         URL url = Lanceur.class.getResource("fxml/HeroScanView.fxml");
-        System.out.println(url);
+        System.out.println(Lanceur.class.getResource("fmxl/HeroScanView.fxml"));
 
         Parent root = FXMLLoader.load(url);
         Scene scene = new Scene(root);

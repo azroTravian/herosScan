@@ -3,9 +3,9 @@ package scanheros.gestion;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.sql.Timestamp;
-import scanheros.Exception.GenderNotFindException;
 import scanheros.equipements.EquipementHomme;
 import scanheros.equipements.IEquipement;
+import scanheros.exception.GenderNotFindException;
 
 public class Enregistrement {
 

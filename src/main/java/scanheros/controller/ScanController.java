@@ -1,4 +1,4 @@
-package scanheros.scan.controller;
+package scanheros.controller;
 
 import java.awt.Desktop;
 import java.io.BufferedInputStream;
@@ -22,12 +22,6 @@ import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Pattern;
-
-import scanheros.gestion.Connexion;
-import scanheros.gestion.Enregistrement;
-import scanheros.gestion.Experience;
-import scanheros.gestion.LigneEnre;
-import scanheros.gestion.TimerScanTask;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.ObjectBinding;
 import javafx.collections.FXCollections;
@@ -52,6 +46,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import scanheros.gestion.Connexion;
+import scanheros.gestion.Enregistrement;
+import scanheros.gestion.Experience;
+import scanheros.gestion.LigneEnre;
+import scanheros.gestion.TimerScanTask;
 import scanheros.popup.PopupAddHero;
 import scanheros.popup.PopupChoixServeur;
 import scanheros.popup.PopupChoixTpsReload;
@@ -68,117 +67,176 @@ public class ScanController implements Initializable {
 	private static String serveur = null;
 	private static String bdd = null;
 	private static Experience expe = null;
-
+	ObservableList<LigneEnre> data = FXCollections.observableArrayList();
+	ObservableList<Ligne> listeHero = FXCollections.observableArrayList();
 	@FXML
 	private BorderPane home;
-
 	@FXML
 	private TableView<LigneEnre> table;
-
 	@FXML
 	private TableColumn<LigneEnre, Integer> col_id;
-
 	@FXML
 	private TableColumn<LigneEnre, String> col_pseudo;
-
 	@FXML
 	private TableColumn<LigneEnre, String> col_casque;
-
 	@FXML
 	private TableColumn<LigneEnre, String> col_bdroit;
-
 	@FXML
 	private TableColumn<LigneEnre, String> col_bgauche;
-
 	@FXML
 	private TableColumn<LigneEnre, String> col_armure;
-
 	@FXML
 	private TableColumn<LigneEnre, String> col_bottes;
-
 	@FXML
 	private TableColumn<LigneEnre, Boolean> col_cheval;
-
 	@FXML
 	private TableColumn<LigneEnre, Integer> col_exp;
-
 	@FXML
 	private TableColumn<LigneEnre, Timestamp> col_date;
-
 	@FXML
 	private MenuBar menuBar;
-
 	@FXML
 	private Menu menuSQL;
-
 	@FXML
 	private MenuItem menuSql1;
-
 	@FXML
 	private MenuItem menuSql2;
-
 	@FXML
 	private MenuItem menuSql3;
-
 	@FXML
 	private Menu menuAjoutHero;
-
 	@FXML
 	private MenuItem menuAjPseudo;
-
 	@FXML
 	private MenuItem menuAjId;
-
 	@FXML
 	private Menu menuCheck;
-
 	@FXML
 	private MenuItem menuChOnce;
-
 	@FXML
 	private MenuItem menuChAuto;
-
 	@FXML
 	private Menu menuSuppr;
-
 	@FXML
 	private MenuItem menuSupprSelect;
-
 	@FXML
 	private MenuItem menuSupprAll;
-
 	@FXML
 	private Menu menuServeur;
-
 	@FXML
 	private MenuItem menuChangeServeur;
-
 	@FXML
 	private MenuItem menuVoir;
-
 	@FXML
 	private TextField cherche_pseudo;
-
 	@FXML
 	private Spinner<Integer> sp_heure;
-
 	@FXML
 	private Spinner<Integer> sp_minute;
-
 	@FXML
 	private Spinner<Integer> sp_seconde;
-
 	@FXML
 	private HBox hbox_top;
-
 	@FXML
 	private DatePicker pick_date;
-
 	@FXML
 	private ToggleButton toggle_filter;
 
-	ObservableList<LigneEnre> data = FXCollections.observableArrayList();
-	ObservableList<Ligne> listeHero = FXCollections.observableArrayList();
+	public static String getServeur() {
+		return serveur;
+	}
+
+	public static void getFileFromWeb(String nameFile) {
+		// Sp�cifier le chemin exact vers le fichier
+		URL u;
+		try {
+			u = new URL(nameFile);
+			// Ouvrir la connexion, d�but de la communication avec le serveur
+			URLConnection uc = u.openConnection();
+			// R�cup�rer la taille exacte en nombre d�octets du fichier d�sign�,
+			// et la stocker dans un int
+			int taille = uc.getContentLength();
+			// Cr�er un flux d�entr�e pour le fichier
+			InputStream brut = uc.getInputStream();
+			// Mettre ce flux d�entr�e en cache (pour un meilleur transfert,
+			// plus s�r et plus r�gulier).
+			InputStream entree = new BufferedInputStream(brut);
+			// Cr�er une matrice (un tableau) de bytes pour stocker tous les
+			// octets du fichier
+			byte[] donnees = new byte[taille];
+			// Pour l�instant aucun octet n�a encore �t� lu
+			int octetsLus = 0;
+			// Octets de d�placement, et octets d�j� lus.
+			int deplacement = 0;
+			float alreadyRead = 0;
+			// Boucle permettant de parcourir tous les octets du fichier � lire
+			while (deplacement < taille) {
+				// utilisation de la methode "read" de la classe InputStream
+				octetsLus = entree.read(donnees, deplacement, donnees.length - deplacement);
+				// Petit calcul: mise � jour du nombre total d�octets lus par
+				// ajout au nombre d�octets lus au cours des pr�c�dents passages
+				// au nombre d�octets lus pendant ce passage
+				alreadyRead = alreadyRead + octetsLus;
+				// -1 marque par convention la fin d�un fichier, double
+				// op�rateur "�gale": = =
+				if (octetsLus == -1) {
+					break;
+				}
+				// se cadrer � un endroit pr�cis du fichier pour lire les octets
+				// suivants, c�est le d�placement
+				deplacement += octetsLus;
+			}
+			// fermer le flux d�entr�e.
+			entree.close();
+			// R�cup�rer le nom du fichier
+			String fichier = u.getFile();
+			fichier = fichier.substring(fichier.lastIndexOf('/') + 1);
+			// Cr�er un fichier sur le DD afin d�y copier le contenu du fichier
+			// t�l�charg� (par un flux de sortie).
+			FileOutputStream fichierSortie = new FileOutputStream(fichier);
+			// copier�
+			fichierSortie.write(donnees);
+			// vider puis fermer le flux de sortie
+			fichierSortie.flush();
+			fichierSortie.close();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void getImageFromWeb(String imageName, int idHero) {
+		try {
+			URL site = new URL(serveur + "/hero_body.php?uid=" + idHero);
+			File file = new File(imageName);
+			file.createNewFile();
+			InputStream in = site.openStream();
+			OutputStream out = new FileOutputStream(file);
+			byte[] b = new byte[2048];
+			int length;
+			while ((length = in.read(b)) != -1) {
+				out.write(b, 0, length);
+			}
+			in.close();
+			out.close();
+		} catch (MalformedURLException ex) {
+			ex.printStackTrace();
+		} catch (FileNotFoundException ex) {
+			ex.printStackTrace();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+
+	public static Connexion getConnexion() {
+		return connexion;
+	}
+
+	public static Experience getExpe() {
+		return expe;
+	}
 
 	//--/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//--/////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -302,8 +360,10 @@ public class ScanController implements Initializable {
 				//				System.out.print("BOTTES : "+resultSet.getString("BOTTES")+" / ");
 				//				System.out.print("CHEVAL : "+resultSet.getBoolean("CHEVAL")+" / ");
 				//				System.out.println("date : "+resultSet.getTimestamp("date"));
-				data.addAll(new LigneEnre(new Enregistrement(resultSet.getInt("id"), resultSet.getString("Pseudo"), 
-						resultSet.getString("Casque"), resultSet.getString("bdroit"),  resultSet.getString("bgauche"), resultSet.getString("armure"), 
+				data.addAll(new LigneEnre(
+					new Enregistrement(resultSet.getInt("id"), resultSet.getString("Pseudo"),
+						resultSet.getString("Casque"), resultSet.getString("bdroit"),
+						resultSet.getString("bgauche"), resultSet.getString("armure"),
 						resultSet.getString("bottes"), resultSet.getBoolean("cheval"), resultSet.getInt("experience"), resultSet.getTimestamp("date"))));
 			}
 			resultSet.close();
@@ -336,7 +396,7 @@ public class ScanController implements Initializable {
 
 
 		pick_date.setValue(LocalDate.now());
-		ObjectBinding<LocalDateTime> dateTime = Bindings.createObjectBinding(() -> 
+		ObjectBinding<LocalDateTime> dateTime = Bindings.createObjectBinding(() ->
 		LocalDateTime.of(pick_date.getValue(),LocalTime.of(sp_heure.getValue(), sp_minute.getValue(), sp_seconde.getValue())),
 		pick_date.valueProperty(), sp_heure.valueProperty(), sp_minute.valueProperty(), sp_seconde.valueProperty());
 
@@ -361,7 +421,7 @@ public class ScanController implements Initializable {
 					if(choiceLine.getPseudo().toLowerCase().contains(lowerCaseFilter)){
 						return true;
 					}
-				}						
+				}
 
 				return false; // Does not match.
 			});
@@ -418,13 +478,11 @@ public class ScanController implements Initializable {
 		table.setItems(sortedData);
 	}
 
-
 	@FXML
 	void once_onclick(ActionEvent event) {
 		TimerTask TimerScanTask = new TimerScanTask(listeHero,this);
 		new Thread(TimerScanTask).start();
 	}
-
 
 	@FXML
 	void auto_onclick(ActionEvent event) {
@@ -487,7 +545,6 @@ public class ScanController implements Initializable {
 			timer.schedule(TimerScanTask, 0, tempsReload);
 		}
 	}
-
 
 	@FXML
 	void ajid_onclick(ActionEvent event) {
@@ -597,7 +654,6 @@ public class ScanController implements Initializable {
 		});
 	}
 
-
 	@FXML
 	void voirServ_onclick(ActionEvent event){
 		try {
@@ -608,104 +664,6 @@ public class ScanController implements Initializable {
 			e.printStackTrace();
 		}
 	}
-
-	public static String getServeur(){
-		return serveur;
-	}
-
-	public static void getFileFromWeb(String nameFile) {
-		// Sp�cifier le chemin exact vers le fichier
-		URL u;
-		try {
-			u = new URL(nameFile);
-			// Ouvrir la connexion, d�but de la communication avec le serveur
-			URLConnection uc = u.openConnection();
-			// R�cup�rer la taille exacte en nombre d�octets du fichier d�sign�,
-			// et la stocker dans un int
-			int taille = uc.getContentLength();
-			// Cr�er un flux d�entr�e pour le fichier
-			InputStream brut = uc.getInputStream();
-			// Mettre ce flux d�entr�e en cache (pour un meilleur transfert,
-			// plus s�r et plus r�gulier).
-			InputStream entree = new BufferedInputStream(brut);
-			// Cr�er une matrice (un tableau) de bytes pour stocker tous les
-			// octets du fichier
-			byte[] donnees = new byte[taille];
-			// Pour l�instant aucun octet n�a encore �t� lu
-			int octetsLus = 0;
-			// Octets de d�placement, et octets d�j� lus.
-			int deplacement = 0;
-			float alreadyRead = 0;
-			// Boucle permettant de parcourir tous les octets du fichier � lire
-			while (deplacement < taille) {
-				// utilisation de la methode "read" de la classe InputStream
-				octetsLus = entree.read(donnees, deplacement, donnees.length - deplacement);
-				// Petit calcul: mise � jour du nombre total d�octets lus par
-				// ajout au nombre d�octets lus au cours des pr�c�dents passages
-				// au nombre d�octets lus pendant ce passage
-				alreadyRead = alreadyRead + octetsLus;
-				// -1 marque par convention la fin d�un fichier, double
-				// op�rateur "�gale": = =
-				if (octetsLus == -1)
-					break;
-				// se cadrer � un endroit pr�cis du fichier pour lire les octets
-				// suivants, c�est le d�placement
-				deplacement += octetsLus;
-			}
-			// fermer le flux d�entr�e.
-			entree.close();
-			// R�cup�rer le nom du fichier
-			String fichier = u.getFile();
-			fichier = fichier.substring(fichier.lastIndexOf('/') + 1);
-			// Cr�er un fichier sur le DD afin d�y copier le contenu du fichier
-			// t�l�charg� (par un flux de sortie).
-			FileOutputStream fichierSortie = new FileOutputStream(fichier);
-			// copier�
-			fichierSortie.write(donnees);
-			// vider puis fermer le flux de sortie
-			fichierSortie.flush();
-			fichierSortie.close();
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public static void getImageFromWeb(String imageName, int idHero){
-		try {
-			URL site = new URL(serveur+"/hero_body.php?uid="+idHero ); 
-			File file = new File(imageName);
-			file.createNewFile();
-			InputStream in = site.openStream();
-			OutputStream out = new FileOutputStream(file);
-			byte[] b = new byte[2048];
-			int length;
-			while ((length = in.read(b)) != -1) {
-				out.write(b, 0, length);
-			}
-			in.close(); 
-			out.close();
-		} catch (MalformedURLException ex) {
-			ex.printStackTrace();
-		} catch (FileNotFoundException ex) {
-			ex.printStackTrace();		
-		} catch (IOException ex) {
-			ex.printStackTrace();		
-		}
-	}
-
-
-	public static Connexion getConnexion() {
-		return connexion;
-	}
-
-
-	public static Experience getExpe() {
-		return expe;
-	}
-
 
 	public ObservableList<LigneEnre> getData() {
 		return data;
