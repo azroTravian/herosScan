@@ -8,7 +8,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -17,12 +20,14 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -32,14 +37,15 @@ import scanheros.controller.Ligne;
 import scanheros.gestion.Connexion;
 
 
-public class PopupAddHero extends Popup {
+public class PopupAddHero implements Popup {
 
     private final ObservableList<Ligne> data;
+    private Dialog<List<String>> popup;
     private Connexion connexion;
     private String type;
     private TableView<Ligne> table;
-    private TableColumn<Ligne, String> col1;
-    private TableColumn<Ligne, Integer> col2;
+    private TableColumn<Ligne, String> colPseudo;
+    private TableColumn<Ligne, Integer> colId;
     private HBox hb1, hb2, hb3, hb4;
     private VBox vb;
     private Text tx1, tx2;
@@ -49,11 +55,16 @@ public class PopupAddHero extends Popup {
 
 
     public PopupAddHero(ObservableList<Ligne> d, String type, Connexion connex) {
-        super("Ajout d'un héros - " + type);
+        popup = new Dialog<>();
+        Stage stage = (Stage) popup.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image(Lanceur.class.getResource("img/itemcasque.png").toString()));
+
+        popup.setTitle("Ajout d'un héros");
+        GridPane grid = new GridPane();
         table = new TableView<>();
         fnlist = FXCollections.observableArrayList();
-        col1 = new TableColumn<>("Pseudo");
-        col2 = new TableColumn<>("ID");
+        colPseudo = new TableColumn<>("Pseudo");
+        colId = new TableColumn<>("ID");
 
         tx1 = new Text("listeHPseudo.txt :  ");
         tx2 = new Text("listeHId.txt :  ");
@@ -70,38 +81,18 @@ public class PopupAddHero extends Popup {
         this.type = type;
         connexion = connex;
         data.addAll(this.d);
-    }
 
-    public boolean running() {
-        return true;
-    }
-
-    public ObservableList<Ligne> getFnList() {
-        return fnlist;
-    }
-
-
-    public void start(Stage s) throws Exception {
-        super.start(getMyDialog());
-        getMyDialog().getIcons()
-            .add(new Image(Lanceur.class.getResource("img/itemcasque.png").toString()));
-        pane1.setStyle(
-            "-fx-background-color:#e6ffff;-fx-padding:10px;-fx-margin:10px;-fx-alignment:center;");
-        pane1.getChildren().add(table);
-        col1.setMinWidth(180);
-        col1.setPrefWidth(180);
-        col2.setMinWidth(120);
-        col2.setPrefWidth(120);
+        colPseudo.setMinWidth(180);
+        colPseudo.setPrefWidth(180);
+        colId.setMinWidth(120);
+        colId.setPrefWidth(120);
         table.setPrefWidth(300);
-        getMyDialog().setWidth(/*table.getWidth()*/380);
-        getMyDialog().setHeight(600);
+
         table.setEditable(false);
 
-        col1.setCellValueFactory(new PropertyValueFactory<>("pseudo"));
+        colPseudo.setCellValueFactory(new PropertyValueFactory<>("pseudo"));
 
-        //col1.setCellFactory(TextFieldTableCell.<Pair<String,Integer>, String>forTableColumn(new DoubleStringConverter()));
-
-        col1.setOnEditCommit(
+        colPseudo.setOnEditCommit(
             new EventHandler<CellEditEvent<Ligne, String>>() {
                 @Override
                 public void handle(CellEditEvent<Ligne, String> t) {
@@ -112,22 +103,20 @@ public class PopupAddHero extends Popup {
             }
         );
 
-        col2.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
 
-        //col2.setCellFactory(TextFieldTableCell.<Pair<String,Integer>, Double>forTableColumn(new DoubleStringConverter()));
-
-        col2.setOnEditCommit(
+        colId.setOnEditCommit(
             t -> t.getTableView().getItems().get(t.getTablePosition().getRow())
                 .setId(t.getNewValue())
         );
 
         table.setItems(data);
-        table.getColumns().addAll(col1, col2);
+        table.getColumns().addAll(colPseudo, colId);
 
         tf1.setPromptText(type);
         tf2.setPromptText(type);
-        tf1.setMaxWidth(col1.getPrefWidth());
-        tf2.setMaxWidth(col1.getPrefWidth());
+        tf1.setMaxWidth(colPseudo.getPrefWidth());
+        tf2.setMaxWidth(colPseudo.getPrefWidth());
 
         //On rend possible uniquement l'ajout de chiffres et d'une virgule dans les champs de texte
         tf1.lengthProperty().addListener(new ChangeListener<Number>() {
@@ -165,8 +154,7 @@ public class PopupAddHero extends Popup {
                             idres = resultSet.getString("id_joueur");
                         }
                     } catch (SQLException e) {
-                        System.err.println("---  ERREUR  ---");
-                        e.printStackTrace();
+                        new PopupError(e).get().show();
                     }
                     //On vérifie que la ligne n'est pas déjà présente, si oui inutile de l'ajouter
                     if (idres != null &&
@@ -186,8 +174,7 @@ public class PopupAddHero extends Popup {
                             psres = resultSet.getString("nom_joueur");
                         }
                     } catch (SQLException e) {
-                        System.err.println("---  ERREUR  ---");
-                        e.printStackTrace();
+                        new PopupError(e).get().show();
                     }
                     //On vérifie que la ligne n'est pas déjà présente, si oui inutile de l'ajouter
                     if (!d.contains(new Ligne(psres, Integer.valueOf(tf1.getText()))) &&
@@ -213,13 +200,8 @@ public class PopupAddHero extends Popup {
                 }
                 Desktop.getDesktop().open(file);
             } catch (IOException e) {
-                PopupError err = new PopupError("Read error : " + e.getMessage());
-                Stage s2 = new Stage();
-                try {
-                    err.start(s2);
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
+                Logger.getLogger(getClass().getName()).log(Level.INFO, null, e);
+                new PopupError(e).get().show();
             }
         });
 
@@ -255,15 +237,7 @@ public class PopupAddHero extends Popup {
 
                 //	br.close();
             } catch (IOException e) {
-                e.printStackTrace();
-                PopupError err = new PopupError("Read error : " + e.getMessage());
-                Stage s2 = new Stage();
-                try {
-                    err.start(s2);
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-
+                new PopupError(e).get().show();
             }
 
         });
@@ -277,13 +251,7 @@ public class PopupAddHero extends Popup {
                 }
                 Desktop.getDesktop().open(file);
             } catch (IOException e) {
-                PopupError err = new PopupError("Read error : " + e.getMessage());
-                Stage s2 = new Stage();
-                try {
-                    err.start(s2);
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
+                new PopupError(e).get().show();
             }
         });
 
@@ -318,13 +286,7 @@ public class PopupAddHero extends Popup {
                 }
                 //	br.close();
             } catch (IOException e) {
-                PopupError err = new PopupError("Read error : " + e.getMessage());
-                Stage s2 = new Stage();
-                try {
-                    err.start(s2);
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
+                new PopupError(e).get().show();
             }
 
 
@@ -350,8 +312,8 @@ public class PopupAddHero extends Popup {
 
             //fermeture de la scanheros.popup
             Node source = (Node) actEvent.getSource();
-            Stage stage = (Stage) source.getScene().getWindow();
-            stage.close();
+            Stage stageToClose = (Stage) source.getScene().getWindow();
+            stageToClose.close();
         });
 
         if (Objects.equals(type, "Pseudo")) {
@@ -374,10 +336,30 @@ public class PopupAddHero extends Popup {
 
         vb.getChildren().addAll(hb1, hb4, hb3, hb2);
         vb.setAlignment(Pos.CENTER);
-        pane1.getChildren().add(vb);
+        //pane1.getChildren().add(vb);
 
+        grid.add(table, 0, 0, 2, 1);
+        grid.add(tf1, 0, 1);
+        grid.add(tf2, 0, 2);
+        grid.add(updateButtonId, 1, 2, 2, 1);
 
+        grid.add(tx1, 0, 3);
+        grid.add(openButtonPseudo, 1, 3);
+        grid.add(updateButtonPs, 2, 3);
+
+        grid.add(tx2, 0, 4);
+        grid.add(openButtonId, 1, 4);
+        grid.add(updateButtonId, 2, 4);
+
+        grid.add(supprButton, 0, 5);
+        grid.add(okButton, 1, 5);
+
+        popup.getDialogPane().setContent(grid);
     }
 
 
+    @Override
+    public Dialog<List<String>> get() {
+        return popup;
+    }
 }

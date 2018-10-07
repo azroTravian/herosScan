@@ -36,7 +36,7 @@ public class Lanceur extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         URL url = Lanceur.class.getResource("fxml/HeroScanView.fxml");
-        System.out.println(Lanceur.class.getResource("fmxl/HeroScanView.fxml"));
+        System.out.println(Lanceur.class.getResource("fxml/HeroScanView.fxml"));
 
         Parent root = FXMLLoader.load(url);
         Scene scene = new Scene(root);

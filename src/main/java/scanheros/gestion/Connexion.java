@@ -19,11 +19,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.concurrent.Task;
-import javafx.stage.Stage;
 import scanheros.popup.PopupAvancee;
 import scanheros.popup.PopupError;
 
 public class Connexion {
+
 
     private String DBPath = "";
     private Connection connection = null;
@@ -37,7 +37,7 @@ public class Connexion {
      *
      * @param enregistrement
      */
-    public void addEnregistrement(Enregistrement enregistrement) {
+    void addEnregistrement(Enregistrement enregistrement) {
         try {
             PreparedStatement preparedStatement = connection
                 .prepareStatement("INSERT INTO Enregistrement VALUES(?,?,?,?,?,?,?,?,?,?)");
@@ -54,8 +54,8 @@ public class Connexion {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             Logger.getLogger(getClass().getName()).log(Level.INFO, null, e);
+            new PopupError(e).get().show();
         }
-
     }
 
     /**
@@ -73,8 +73,8 @@ public class Connexion {
                         new Enregistrement(Integer.valueOf(resultSet.getString("id_joueur"))));
                 }
             } catch (SQLException e) {
-                System.err.println("---  ERREUR  ---");
-                e.printStackTrace();
+                Logger.getLogger(getClass().getName()).log(Level.INFO, null, e);
+                new PopupError(e).get().show();
             }
         }
         return mapId;
@@ -89,8 +89,8 @@ public class Connexion {
         try {
             resultat = statement.executeQuery(requet);
         } catch (SQLException e) {
-            System.out.println("Erreur dans la requet : " + requet);
-            e.printStackTrace();
+            Logger.getLogger(getClass().getName()).log(Level.INFO, null, e);
+            new PopupError(e).get().show();
         }
         return resultat;
 
@@ -105,8 +105,8 @@ public class Connexion {
             PopupAvancee popAvancee = new PopupAvancee();
             popAvancee.getpBar().progressProperty().bindBidirectional(avancee);
             popAvancee.getpInd().progressProperty().bindBidirectional(avancee);
-            Stage s0 = new Stage();
-            popAvancee.start(s0);
+
+            popAvancee.get().show();
             System.out.println("File " + cheminFichier + " opened successfully");
             final int taille = Files.readAllLines(chemin_fichier).size();
 
@@ -131,37 +131,12 @@ public class Connexion {
                 run1.stateProperty().addListener((observableValue, oldValue, newValue) -> {
                     switch (newValue) {
                         case FAILED:
-                            PopupError err1 = new PopupError(
-                                "Task result : " + newValue.toString());
-                            Stage s1 = new Stage();
-                            try {
-                                err1.start(s1);
-                            } catch (Exception e1) {
-                                e1.printStackTrace();
-                            }
+                            new PopupError("Task result : " + newValue).get().show();
                             break;
                         case CANCELLED:
-                            PopupError err2 = new PopupError(
-                                "Task result : " + newValue.toString());
-                            Stage s2 = new Stage();
-                            try {
-                                err2.start(s2);
-                            } catch (Exception e1) {
-                                e1.printStackTrace();
-                            }
+                            new PopupError("Task result : " + newValue).get().show();
                             break;
                         case SUCCEEDED:
-                            System.out.println(newValue.toString());
-                            try {
-                                popAvancee.stop();
-                                s0.close();
-                                //Node  source = (Node) s0.getScene().getWindow()
-                                //Stage stage  = (Stage) s0.getScene().getWindow();
-                                //stage.close();
-                                System.out.println("rr");
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
                             break;
                         default:
                             break;
@@ -169,12 +144,14 @@ public class Connexion {
                 });
 
             } catch (Exception e) {
-                e.printStackTrace();
+                Logger.getLogger(getClass().getName()).log(Level.INFO, null, e);
+                new PopupError(e).get().show();
             }
 
             br.close();
         } catch (Exception e) {
             Logger.getLogger(getClass().getName()).log(Level.INFO, null, e);
+            new PopupError(e).get().show();
         }
     }
 
@@ -190,6 +167,7 @@ public class Connexion {
                 .log(Level.INFO, () -> ("** Connexion a " + DBPath + " avec succès **"));
         } catch (ClassNotFoundException | SQLException e) {
             Logger.getLogger(getClass().getName()).log(Level.INFO, null, e);
+            new PopupError(e).get().show();
         }
     }
 
@@ -198,6 +176,7 @@ public class Connexion {
             statement.executeUpdate("DROP TABLE " + table + "");
         } catch (SQLException e) {
             Logger.getLogger(getClass().getName()).log(Level.INFO, null, e);
+            new PopupError(e).get().show();
         }
     }
 
@@ -206,6 +185,7 @@ public class Connexion {
             statement.executeUpdate("DELETE FROM " + table + "");
         } catch (SQLException e) {
             Logger.getLogger(getClass().getName()).log(Level.INFO, null, e);
+            new PopupError(e).get().show();
         }
     }
 
@@ -218,18 +198,21 @@ public class Connexion {
             statement.executeUpdate(requete);
         } catch (SQLException e) {
             Logger.getLogger(getClass().getName()).log(Level.INFO, null, e);
+            new PopupError(e).get().show();
         }
     }
 
-    /**
-     *
-     */
     public void close() {
         try {
             connection.close();
             statement.close();
         } catch (SQLException e) {
             Logger.getLogger(getClass().getName()).log(Level.INFO, null, e);
+            new PopupError(e).get().show();
         }
+    }
+
+    public Connection getConnection() {
+        return connection;
     }
 }

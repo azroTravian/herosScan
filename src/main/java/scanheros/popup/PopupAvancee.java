@@ -1,33 +1,28 @@
 package scanheros.popup;
 
-import javafx.scene.Node;
-import javafx.scene.control.Button;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
-import scanheros.Lanceur;
 
-public class PopupAvancee extends Popup {
+public class PopupAvancee implements Popup {
+
+    private Alert popup;
 
     private ProgressBar pBar;
     private ProgressIndicator pInd;
-    private Text imp;
-    private HBox h;
-    private VBox v;
-    private Button val;
 
     public PopupAvancee() {
-        super("Running");
+        popup = new Alert(AlertType.INFORMATION);
         pBar = new ProgressBar(0.0);
         pInd = new ProgressIndicator(0.0);
-        imp = new Text("Running");
-        h = new HBox(10);
-        v = new VBox(10);
-        val = new Button("OK");
+        Text imp = new Text("Running");
+        HBox h = new HBox(10);
+        h.getChildren().addAll(imp, pBar, pInd);
+        popup.getDialogPane().setContent(h);
     }
 
     public ProgressIndicator getpInd() {
@@ -46,25 +41,9 @@ public class PopupAvancee extends Popup {
         this.pBar = pBar;
     }
 
-    public void start(Stage s) throws Exception {
-        super.start(getMyDialog());
-        getMyDialog().getIcons()
-            .add(new Image(Lanceur.class.getResource("img/exclamation.png").toString()));
-        h.setStyle("-fx-alignment:center;");
-        v.setStyle("-fx-alignment:center;");
-        h.getChildren().addAll(imp);
-        v.getChildren().addAll(h, pBar, pInd);
-        pane1.setStyle(
-            "-fx-background-color:rgb(219,198,211);-fx-padding:10px;-fx-alignment:center;");
-        pane1.getChildren().addAll(v);
-        getMyDialog().setWidth(imp.getLayoutBounds().getWidth() + 100);
-        getMyDialog().setHeight(150);
-        val.setOnAction(event -> {
-            Node source = (Node) event.getSource();
-            Stage stage = (Stage) source.getScene().getWindow();
-            stage.close();
-        });
+
+    @Override
+    public Dialog get() {
+        return popup;
     }
-
-
 }

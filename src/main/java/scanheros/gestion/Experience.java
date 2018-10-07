@@ -1,10 +1,13 @@
 package scanheros.gestion;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import scanheros.controller.ScanController;
+import scanheros.popup.PopupError;
 
 public class Experience {
 
@@ -36,7 +39,8 @@ public class Experience {
                 expF = Integer.valueOf(ligne);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger.getLogger(getClass().getName()).log(Level.INFO, null, e);
+            new PopupError(e).get().show();
         }
         return expF;
     }

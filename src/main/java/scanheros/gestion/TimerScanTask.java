@@ -18,6 +18,7 @@ import scanheros.equipements.EquipementFemme;
 import scanheros.equipements.EquipementHomme;
 import scanheros.equipements.IEquipement;
 import scanheros.exception.GenderNotFindException;
+import scanheros.popup.PopupError;
 
 public class TimerScanTask extends TimerTask {
 
@@ -72,7 +73,7 @@ public class TimerScanTask extends TimerTask {
                     equipH, equipF);
 
                 /* On supprime l'image, pour pas stocker inutilement des images*/
-                new File(imageNom).delete()
+                boolean delete = new File(imageNom).delete();
 
                 /* On termine par l'exp*/
                 enre.setExperience(ScanController.getExpe().getExp(enre.getPseudo()));
@@ -94,6 +95,7 @@ public class TimerScanTask extends TimerTask {
 
         } catch (IOException | InterruptedException | GenderNotFindException e) {
             Logger.getLogger(getClass().getName()).log(Level.INFO, null, e);
+            new PopupError(e).get().show();
         }
     }
 }

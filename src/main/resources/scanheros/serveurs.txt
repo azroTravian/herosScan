@@ -1,0 +1,6 @@
+ts1.travian.fr
+ts2.travian.fr
+ts3.travian.fr
+ts4.travian.fr
+tx3.travian.fr
+tx2.travian.fr
